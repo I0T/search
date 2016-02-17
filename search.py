@@ -19,10 +19,11 @@ def so():
     print('[%s]360搜索开始运行'%time.strftime("%X"))
     print('[%s]开始获取结果所有页面'%time.strftime("%X"))
     urls = open('I0T.txt')
-    reason = open('urls.txt','a+')
+    reason = open('urls_1.txt','a+')
     #悲催的先获取总页面
     for url in urls:
         url = 'site:'+url.strip('\n')
+        print('[%s]开始获取%s的结果页码'%(time.strftime("%X"),url))
         page_max =1
         html = requests.get('https://www.so.com/s?q=%s&pn=%s'%(url,page_max),{User_Agent:User_Agent})
         page_1 = re.findall('%3D&pn=(.*?)&psid',html.text,re.S)
@@ -35,6 +36,7 @@ def so():
             break
             # print('一共有%s页结果'%page_max)
         while page_max >9:
+            #能否先获取63页源代码 看是否能找到64 能就直接确定是64 节约时间＋＋＋＋＋＋＋
             html = requests.get('https://www.so.com/s?q=%s&pn=%s'%(url,page_max),{User_Agent:User_Agent})
             page_1 = re.findall('%3D&pn=(.*?)&psid',html.text,re.S)
             page_max_2 = max([int(k) for k in page_1])
@@ -46,12 +48,36 @@ def so():
         print('[%s]%s 一共有%s页结果'%(time.strftime("%X"),url,page_max))
         #开始获取所以链接并保存下来吧
         print('[%s]开始获取所有搜索结果'%time.strftime("%X"))
-        #难道 先让他302跳转 （http://www.so.com/link?url=http%3A%2F%2Fc.360webcache.com%2Fc%3Fm%3D0279d6e0853e5ac496cf2d95bf68b317%26q%3Dsite%253Atjut.edu.cn%2Bid%253D%26u%3Dhttp%253A%252F%252Fshenbo.org.tjut.edu.cn%252Ftt%252Fpersoninfo.asp%253Fbianhao%253D199&q=site%3Atjut.edu.cn+id%3D&ts=1455696099&t=04e870ac1e42ad94be9b503c317d770&src=haosou）
-        #然后 获取快照源码 再取得url链接？？
+        for page in list(range(1,page_max+1)):
+            html = requests.get('https://www.so.com/s?q=%s&pn=%s'%(url,page),{User_Agent:User_Agent})
+            url_find = re.findall('http%253A%252F%252F(.*?)&q',html.text,re.S)
+            for url_finds in url_find:
+                #爬取下来的链接格式需要处理
+                url_finds =url_finds.replace('%252F','/').replace('%253F','?')\
+                    .replace('%253D','=').replace('%252C',',').replace('%2526','&')\
+                    .replace('%2525','%').replace('%257','~').replace('%2528','(')\
+                    .replace('%2529',')')
+                re_find=re.findall('=.',url_finds,re.S)
+                if re_find != []:
+                    reason.writelines(url_finds+'\n')
+                    print('[%s]'%time.strftime("%X")+url_finds)
+            print('[%s]第%s/%s页获取完毕'%(time.strftime("%X"),page,page_max))
+    #删除程序运行残留文件
     os.remove('I0T.txt')
+#用于处理最终结果链接
+def file():
+    print('[%s]开始处理最终URL'%time.strftime('%X'))
+    fs = set([fs for fs in open('urls_1.txt')])
+    url = open('urls.txt','w')
+    for f in fs:
+        url.writelines(f)
+    #删除程序运行残留文件
+    os.remove('urls_1.txt')
+    print('[%s]URL处理完毕'%time.strftime('%X'))
 def run():
     url()
     so()
+    file()
 if __name__ == "__main__":
     start = time.time()
     print ('['+time.strftime("%X")+']'+'程序开始运行')
