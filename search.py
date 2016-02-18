@@ -55,12 +55,12 @@ def so():
                 #爬取下来的链接格式需要处理
                 url_finds =url_finds.replace('%252F','/').replace('%253F','?')\
                     .replace('%253D','=').replace('%252C',',').replace('%2526','&')\
-                    .replace('%2525','%').replace('%257','~').replace('%2528','(')\
-                    .replace('%2529',')')
+                    .replace('%2525','%').replace('%2528','(')\
+                    .replace('%2529',')').replace('%253A',':').replace('%2540','@')
                 re_find=re.findall('=.',url_finds,re.S)
                 if re_find != []:
                     reason.writelines(url_finds+'\n')
-                    print('[%s]'%time.strftime("%X")+url_finds)
+                    # print('[%s]'%time.strftime("%X")+url_finds)
             print('[%s]第%s/%s页获取完毕'%(time.strftime("%X"),page,page_max))
     #删除程序运行残留文件
     os.remove('I0T.txt')
