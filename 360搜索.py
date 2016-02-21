@@ -2,6 +2,7 @@
 #-*-coding:utf-8-*-
 __author__ = 'IOT'
 # 爬取wooyun所有注入点 可获取可能的注入后缀
+#把命令行功能导入过去 然后开始写百度＋google的
 import os,re,time
 import requests
 import itertools
@@ -40,9 +41,9 @@ def so():
             html = requests.get('https://www.so.com/s?q=%s&pn=%s'%(url,page_max),{User_Agent:User_Agent})
             page_1 = re.findall('%3D&pn=(.*?)&psid',html.text,re.S)
             page_max_2 = max([int(k) for k in page_1])
-            if page_max_2 ==page_max-1:#垃圾360当搜索页面满了当时候 会一直循环匹配a a-1 a a-1
+            if page_max_2 ==page_max-1:#360当搜索页面满了当时候 会一直循环匹配a a-1 a a-1
                 break
-            elif page_max ==64:#垃圾360最多只能有64页结果
+            elif page_max ==64:#360最多只能有64页结果
                 break
             page_max=page_max_2
         print('[%s]%s 一共有%s页结果'%(time.strftime("%X"),url,page_max))
